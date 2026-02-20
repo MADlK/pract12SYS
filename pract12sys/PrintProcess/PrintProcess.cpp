@@ -7,8 +7,39 @@
 #include <thread>
 using namespace std;
 
+
+DWORD Out = 10000;
+DWORD startproc = GetTickCount();
 DWORD getRandomDelay(int minMs, int maxMs) {
     return minMs + rand() % (maxMs - minMs + 1);
+}
+void timereset()
+{
+    //проверка что принтер используется
+    HANDLE hClient = OpenMutex(SYNCHRONIZE, FALSE, L"mutex");
+    if (hClient)
+    {
+        DWORD wait = WaitForSingleObject(hClient, 0);
+        if (wait == WAIT_OBJECT_0)
+        {
+            startproc = GetTickCount();
+            cout << "time out 00 min" << endl;
+            ReleaseMutex(hClient);
+        }
+        CloseHandle(hClient);
+    }
+}
+void pech(HANDLE hMutex)
+{
+    //удержание мютекса 2 сек
+    
+    
+    
+    
+        cout << "Pechataet..." << endl;
+    
+    WaitForSingleObject(hMutex, getRandomDelay(2000, 3000));
+    system("cls");
 }
 
 
@@ -21,52 +52,32 @@ int main()
         return 0;
     }
 
-    //10 минут?
+ 
 
-    DWORD Out = 60 * 10 * 1000;
-    DWORD start = GetTickCount();
+    
+    //DWORD Out = 60 * 10 * 1000;
+    
+  
 
-    //сам процесс
-    while (true)
+   
+    
+    if (Out - startproc > 0)
     {
-
-        //проверка что принтер используется
-        HANDLE hClient = OpenMutex(SYNCHRONIZE, FALSE, L"mutex");
-        if (hClient)
-        {
-            DWORD wait = WaitForSingleObject(hClient, 0);
-            if (wait == WAIT_OBJECT_0)
-            {
-                start = GetTickCount();
-                cout<<"time out 00 min" << endl;
-                ReleaseMutex(hClient);
-            }
-            CloseHandle(hClient);
-        }
-
-
-        
-        
-        
-        DWORD end = GetTickCount();
-        if ((end - start) > 10000)
-        {
-            system("cls");
-            cout << "Print Error" << endl;
-        }
-       
-            system("cls");
-            cout << "Pechataet..." << endl;
-        
-            
-        
-        WaitForSingleObject(hMutex, getRandomDelay(5000, 15000));
-
-         
-        
+        pech(hMutex);
+        cout << "Gotovo" << endl;
+        system("cls");
+        ReleaseMutex(hMutex);
+        timereset();
     }
-    ReleaseMutex(hMutex);
-    system("cls");
+
+    
+    
+
+    
+
+    
+   
+    
     cout << "Completed" << endl;
     
 
