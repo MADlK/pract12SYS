@@ -3,13 +3,14 @@
 
 #include <iostream>
 #include <Windows.h>
-#include <Ctime>
+
 #include <thread>
 
 using namespace std;
 
 
-wchar_t print[] = L"C:\\Users\\st310-09\\Desktop\\pract12sys\\pract12\\x64\\Debug\\PrintProcess.exe";
+//wchar_t print[] = L"C:\\Users\\st310-09\\Desktop\\pract12sys\\pract12\\x64\\Debug\\PrintProcess.exe";
+wchar_t print[] = L"C:\\Users\\m20er\\OneDrive\\Рабочий стол\\pract12sys\\pract12\\x64\\Debug\\PrintProcess.exe";
 
 
 int main()
@@ -20,11 +21,15 @@ int main()
     ZeroMemory(&si, sizeof(STARTUPINFO));
     si.cb = sizeof(STARTUPINFO);
     DWORD p;
-    if (!CreateProcess((LPWSTR)print, NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
+    if (!CreateProcess(NULL, print, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
     {
         cout<<"Error create" << GetLastError()<<endl;
         return 0;
     }
+   
+
+
+    
     
     
     CloseHandle(pi.hThread);

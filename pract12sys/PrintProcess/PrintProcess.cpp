@@ -3,13 +3,15 @@
 
 #include <iostream>
 #include <Windows.h>
-#include <Ctime>
+
 #include <thread>
 using namespace std;
 
 
-DWORD Out = 10000;
+DWORD Out = 5000;
+//DWORD Out = 60 * 10 * 1000;
 DWORD startproc = GetTickCount();
+bool con = false;
 DWORD getRandomDelay(int minMs, int maxMs) {
     return minMs + rand() % (maxMs - minMs + 1);
 }
@@ -20,12 +22,15 @@ void timereset()
     if (hClient)
     {
         DWORD wait = WaitForSingleObject(hClient, 0);
-        if (wait == WAIT_OBJECT_0)
+        if (wait == WAIT_TIMEOUT)
         {
+            con = false;
             startproc = GetTickCount();
-            cout << "time out 00 min" << endl;
+            
             ReleaseMutex(hClient);
         }
+        else
+            con = true;
         CloseHandle(hClient);
     }
 }
@@ -38,39 +43,53 @@ void pech(HANDLE hMutex)
     
         cout << "Pechataet..." << endl;
     
-    WaitForSingleObject(hMutex, getRandomDelay(2000, 3000));
+    Sleep(getRandomDelay(2000, 3000));
     system("cls");
 }
 
 
 int main()
 {
+    setlocale(0, "ru");
+
+
     HANDLE hMutex = CreateMutex(nullptr, FALSE, L"mutex");
     if (!hMutex)
     {
         cout << "Err create mutex" << endl;
         return 0;
     }
+    //ждем подключения
+    cout << "подключение" << endl;
+    while (!con)
+    {
+        timereset();
+    }
+
 
  
 
     
-    //DWORD Out = 60 * 10 * 1000;
     
-  
-
+    
+    system("cls");
    
+    DWORD now =0;
     
-    if (Out - startproc > 0)
+    while(startproc + Out> now) //подумать над условием
     {
+
+        
+        
         pech(hMutex);
         cout << "Gotovo" << endl;
+        Sleep(1000);
         system("cls");
-        ReleaseMutex(hMutex);
-        timereset();
+        
+        now = GetTickCount();
     }
-
     
+    ReleaseMutex(hMutex);
     
 
     
@@ -79,7 +98,7 @@ int main()
    
     
     cout << "Completed" << endl;
-    
+    WaitForSingleObject(hMutex, getRandomDelay(2000, 3000));
 
 
     
