@@ -38,17 +38,20 @@ int main()
     CloseHandle(pi.hProcess);
     */
     
-    HANDLE hMutex = CreateMutex(NULL, FALSE, L"mutex");
+    HANDLE hMutex = CreateMutex(NULL, TRUE, L"mutex");
     if (!hMutex)
     {
         cout << "Err create mutex" << endl;
         return 0;
     }
+    cout << "wait" <<endl;
     WaitForSingleObject(hMutex, INFINITE);
-    
+    cout << "waited" << endl;
+    Sleep(2000);
+    ReleaseMutex(hMutex);
     CloseHandle(hMutex);
-    Sleep(10000);
-    cin;
+    
+    
     
 }
 

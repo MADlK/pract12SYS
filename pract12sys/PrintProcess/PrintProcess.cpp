@@ -8,7 +8,7 @@
 using namespace std;
 
 
-DWORD Out = 5000;
+DWORD Out = 15000;
 //DWORD Out = 60 * 10 * 1000;
 DWORD startproc = GetTickCount();
 bool con = false;
@@ -19,18 +19,21 @@ void timereset()
 {
     //проверка что принтер используется
     HANDLE hClient = OpenMutex(SYNCHRONIZE, FALSE, L"mutex");
-    if (hClient)
+    if (hClient)//если мьютекс создан
     {
-        DWORD wait = WaitForSingleObject(hClient, 0);
+        DWORD wait = WaitForSingleObject(hClient, 1);
         if (wait == WAIT_TIMEOUT)
         {
-            con = false;
+            con = true;
             startproc = GetTickCount();
             
             ReleaseMutex(hClient);
         }
-        else
-            con = true;
+        else//если никого нет
+        {
+            con = false;
+        }
+            
         CloseHandle(hClient);
     }
 }
@@ -53,52 +56,73 @@ int main()
     setlocale(0, "ru");
 
 
-    HANDLE hMutex = CreateMutex(nullptr, FALSE, L"mutex");
+    HANDLE hMutex = CreateMutex(NULL, FALSE, L"mutex");
     if (!hMutex)
     {
         cout << "Err create mutex" << endl;
         return 0;
     }
-    //ждем подключения
+    //ReleaseMutex(hMutex);
+    ////ждем подключения
     cout << "подключение" << endl;
-    while (!con)
+    //while (!con)
+    //{
+    //    timereset();
+    //}
+
+
+    while (true)
     {
-        timereset();
-    }
+        
+        DWORD wait = WaitForSingleObject(hMutex, 1);
+        if (wait == WAIT_TIMEOUT)
+        {
+            cout << "pechat"<<endl;
 
 
- 
+
+
+            con = true;
+            startproc = GetTickCount();
+
+            
+        }
+        else if (wait == WAIT_OBJECT_0)
+        {
+            ReleaseMutex(hMutex);
+        }
+ }
 
     
     
     
-    system("cls");
+   /* system("cls");
+    cout << "1234" << endl;
+    DWORD now =0;*/
+    
+    //while(startproc + Out> now) //подумать над условием
+    //{
+
+    //    
+    //    
+    //    pech(hMutex);
+    //    cout << "Gotovo" << endl;
+    //    Sleep(1000);
+    //    system("cls");
+    //    
+    //    now = GetTickCount();
+    //}
+    //
+    //ReleaseMutex(hMutex);
+    //
+
+    //
+
+    //
    
-    DWORD now =0;
-    
-    while(startproc + Out> now) //подумать над условием
-    {
-
-        
-        
-        pech(hMutex);
-        cout << "Gotovo" << endl;
-        Sleep(1000);
-        system("cls");
-        
-        now = GetTickCount();
-    }
-    
-    ReleaseMutex(hMutex);
-    
-
-    
-
-    
-   
-    
-    cout << "Completed" << endl;
-    WaitForSingleObject(hMutex, getRandomDelay(2000, 3000));
+    //
+    //cout << "Completed" << endl;
+    //WaitForSingleObject(hMutex, getRandomDelay(2000, 3000));
 
 
     
