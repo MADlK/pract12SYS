@@ -21,6 +21,7 @@ void timereset()
     HANDLE hClient = OpenMutex(SYNCHRONIZE, FALSE, L"mutex");
     if (hClient)//если мьютекс создан
     {
+
         DWORD wait = WaitForSingleObject(hClient, 1);
         if (wait == WAIT_TIMEOUT)
         {
@@ -69,32 +70,50 @@ int main()
     //{
     //    timereset();
     //}
+    DWORD now = 0;
+    bool gotovo = false;
+    bool pech = false;
 
-
-    while (true)
+    while (startproc + Out > now)
     {
         
         DWORD wait = WaitForSingleObject(hMutex, 1);
         if (wait == WAIT_TIMEOUT)
         {
-            cout << "pechat"<<endl;
+            if(!pech)
+            {
+                cout << "pechat" << endl;
+                pech = true;
+            }
+            
 
 
 
 
             con = true;
             startproc = GetTickCount();
+            gotovo = true;
 
             
         }
         else if (wait == WAIT_OBJECT_0)
         {
             ReleaseMutex(hMutex);
+
+            if (gotovo)
+            {
+                pech = false;
+                gotovo = false;
+                cout << "GOTOVO" << endl;
+            }
+            
         }
- }
+        
+        now = GetTickCount();
+    }
 
     
-    
+    cout << "time out" << endl;
     
    /* system("cls");
     cout << "1234" << endl;
